@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package tp.note.ihm.antonind;
+package tp.note;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -15,15 +10,17 @@ import javafx.stage.Stage;
  *
  * @author Antonin
  */
-public class TpNoteIHMAntoninD extends Application {
+public class GraphicalEditor extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/tp/note/view/GraphicalEditorView.fxml"));
         
         Scene scene = new Scene(root);
         
         stage.setScene(scene);
+        stage.setTitle("Graphical Editor");
+        stage.setResizable(false);
         stage.show();
     }
 

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tp.note.controller.GraphicalEditorController">
+   <children>
+      <VBox alignment="CENTER" minWidth="150.0">
+         <children>
+              <Label fx:id="labelOption" alignment="CENTER" minHeight="80.0" minWidth="200.0" text="Options :" textAlignment="CENTER" />
+            <RadioButton fx:id="rbSelectMove" minWidth="200.0" mnemonicParsing="false" text="Select / Move">
+               <padding>
+                  <Insets bottom="10.0" left="20.0" top="10.0" />
+               </padding>
+            </RadioButton>
+            <Separator prefWidth="200.0" />
+            <RadioButton fx:id="rbEllipse" minWidth="200.0" mnemonicParsing="false" text="Ellipse">
+               <padding>
+                  <Insets bottom="10.0" left="20.0" top="10.0" />
+               </padding>
+            </RadioButton>
+            <RadioButton fx:id="rbRectangle" minWidth="200.0" mnemonicParsing="false" text="Rectangle">
+               <padding>
+                  <Insets bottom="10.0" left="20.0" top="10.0" />
+               </padding>
+            </RadioButton>
+            <RadioButton fx:id="rbLine" minWidth="200.0" mnemonicParsing="false" text="Line">
+               <padding>
+                  <Insets bottom="10.0" left="20.0" top="10.0" />
+               </padding>
+            </RadioButton>
+            <Separator prefWidth="200.0" />
+            <ColorPicker fx:id="colorPicker" minHeight="50.0">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="10.0" />
+               </VBox.margin>
+            </ColorPicker>
+            <Separator prefWidth="200.0" />
+            <Button fx:id="btnDelete" minWidth="175.0" mnemonicParsing="false" onAction="#handleButtonDelete" text="Delete">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="10.0" />
+               </VBox.margin>
+            </Button>
+              <Button fx:id="btnClone" minWidth="175.0" onAction="#handleButtonClone" text="Clone">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="10.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+      <Separator orientation="VERTICAL" prefHeight="200.0" />
+      <Canvas fx:id="canvas" height="400.0" width="400.0" />
+   </children>
+</HBox>

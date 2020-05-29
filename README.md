@@ -9,7 +9,7 @@ HMI - Polytech ET3 IT - Noted practical for S6
 
 ## Objectives / Asked work
 
-[Subject link](./sujet-tp-note.pdf)
+[Subject link](./IHM_Polytech_Programmation_des_Interfaces_Interactives_Avancees_1.pdf)
 
 ## Getting Started
 
