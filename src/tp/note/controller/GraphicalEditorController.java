@@ -76,6 +76,7 @@ public class GraphicalEditorController implements Initializable {
     private void handleButtonDelete(ActionEvent event) {
         if (selectedShape != null) {
             shapeList.remove(selectedShape);
+            selectedShape = null;
         }
         updateCanvas();
     }
@@ -100,6 +101,7 @@ public class GraphicalEditorController implements Initializable {
             
             if (duplicatedShape != null) {
                 duplicatedShape.setFill(selectedShape.getFill());
+                duplicatedShape.setStroke(Color.BLACK);
                 shapeList.add(duplicatedShape);
             }
         }
@@ -166,6 +168,15 @@ public class GraphicalEditorController implements Initializable {
             }
         });
         
+        this.colorPicker.valueProperty().addListener(new ChangeListener<Color>() {
+            @Override
+            public void changed(ObservableValue<? extends Color> observable, Color oldValue, Color newValue) {
+                if (selectedShape != null) {
+                    updateColorSelection(newValue);
+                    updateCanvas();
+                }
+            }
+        });
         
         
         // when mouse pressed..
@@ -179,8 +190,9 @@ public class GraphicalEditorController implements Initializable {
             // ..and select a shape (works for the correct "mode")
             if (nextShape == NextShapeToDraw.NONE) {
                 selectedShape = getCanvasShapeAt(lastX, lastY);
-                updateCanvas();
             }
+            
+            updateCanvas();
         });
 
         // when mouse dragged : display the shape to create
@@ -282,14 +294,10 @@ public class GraphicalEditorController implements Initializable {
                         break;
                     case LINE:
                         shapeToDraw = new Line(lastX, lastY, x, y);
-                        
-                        ((Line)shapeToDraw).setStrokeWidth(5);
-                        
-                        ((Line)shapeToDraw).setFill(null);
-                        
-                        ((Line)shapeToDraw).setStroke(this.colorPicker.getValue());
-                        
-                        ((Line)shapeToDraw).setStrokeWidth(5);
+                        shapeToDraw.setStrokeWidth(5);
+                        shapeToDraw.setFill(null);
+                        shapeToDraw.setStroke(this.colorPicker.getValue());
+                        shapeToDraw.setStrokeWidth(5);
                         break;
                     default:
                         // should'nt be reached
@@ -321,11 +329,12 @@ public class GraphicalEditorController implements Initializable {
     }
     
     /**
-     * Redraw the shapes
+     * Redraw the shapes of the collection.
      */
     private void updateCanvas() {
         graphicContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         
+        // Depending on their type, each shape of the collection is displayed
         for (Shape shape : shapeList) {
             graphicContext.setFill(shape.getFill());
             graphicContext.setStroke(shape.getStroke());
@@ -350,6 +359,7 @@ public class GraphicalEditorController implements Initializable {
             }
         }
         
+        // set the graphicContext default behaviour
         graphicContext.setFill(this.colorPicker.getValue());
         graphicContext.setStroke(Color.BLACK);
         graphicContext.setLineWidth(1);
@@ -376,7 +386,7 @@ public class GraphicalEditorController implements Initializable {
     }
     
     /**
-     * 
+     * Give to the current selected shape its default aspect.
      */
     private void unselectShape() {
         if (selectedShape != null) {
@@ -392,6 +402,11 @@ public class GraphicalEditorController implements Initializable {
         }
     }
 
+    /**
+     * Attempt to move the selected Shape.
+     * @param dx
+     * @param dy 
+     */
     private void moveSelection(double dx, double dy) {
         if (selectedShape != null) {
             for (Shape shape : shapeList) {
@@ -401,6 +416,23 @@ public class GraphicalEditorController implements Initializable {
 
                     //Adding transformation to selectedShape 
                     shape.getTransforms().addAll(translate); 
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Modify selected shape color.
+     * @param dx
+     * @param dy 
+     */
+    private void updateColorSelection(Color color) {
+        if (selectedShape != null) {
+            for (Shape shape : shapeList) {
+                if (shape.equals(selectedShape)) {
+                    // update the shape with the specified color
+                    shape.setFill(color);
                     break;
                 }
             }
