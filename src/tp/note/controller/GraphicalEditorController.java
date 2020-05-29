@@ -74,10 +74,12 @@ public class GraphicalEditorController implements Initializable {
     
     @FXML
     private void handleButtonDelete(ActionEvent event) {
+        // remove the selected shape from the collection..
         if (selectedShape != null) {
             shapeList.remove(selectedShape);
             selectedShape = null;
         }
+        // ..and force refresh
         updateCanvas();
     }
     
@@ -85,6 +87,8 @@ public class GraphicalEditorController implements Initializable {
     private void handleButtonClone(ActionEvent event) {
         if (selectedShape != null) {
             Shape duplicatedShape = null;
+        
+            // The clone built depends of the selected shape's type :
             if (selectedShape instanceof Rectangle) {
                 Rectangle rect = (Rectangle)selectedShape;
                 duplicatedShape = new Rectangle(rect.getX() + 10, rect.getY() + 10,
@@ -110,6 +114,7 @@ public class GraphicalEditorController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // init variables
         this.shapeList = new ArrayList<>();
         this.nextShape = NextShapeToDraw.NONE;
         graphicContext = canvas.getGraphicsContext2D();
@@ -179,6 +184,7 @@ public class GraphicalEditorController implements Initializable {
         });
         
         
+        
         // when mouse pressed..
         canvas.setOnMousePressed(e -> {
             // ..save its position
@@ -241,10 +247,7 @@ public class GraphicalEditorController implements Initializable {
                         graphicContext.setStroke(this.colorPicker.getValue());
                         graphicContext.strokeLine(lastX, lastY, x, y);
                         
-                        // reset default line width
-                        graphicContext.setLineWidth(1);
-                        graphicContext.setFill(this.colorPicker.getValue());
-                        graphicContext.setStroke(Color.BLACK);
+                        resetDrawingBehaviour();
                         break;
                     default:
                         // should'nt be reached
@@ -359,10 +362,7 @@ public class GraphicalEditorController implements Initializable {
             }
         }
         
-        // set the graphicContext default behaviour
-        graphicContext.setFill(this.colorPicker.getValue());
-        graphicContext.setStroke(Color.BLACK);
-        graphicContext.setLineWidth(1);
+        resetDrawingBehaviour();
     }
 
     /**
@@ -437,5 +437,16 @@ public class GraphicalEditorController implements Initializable {
                 }
             }
         }
+    }
+
+    /**
+     * Set the Graphic Context default parameters. (small black outline and
+     * fill w/ current color picked).
+     */
+    private void resetDrawingBehaviour() {
+        // reset default line width
+        graphicContext.setLineWidth(1);
+        graphicContext.setStroke(Color.BLACK);
+        graphicContext.setFill(this.colorPicker.getValue());
     }
 }
