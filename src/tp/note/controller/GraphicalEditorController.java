@@ -21,25 +21,29 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.transform.Translate;
 import tp.note.model.NextShapeToDraw;
 
 /**
- *
+ * Main controller of the application.
  * @author Antonin
  */
 public class GraphicalEditorController implements Initializable {
     
     private ToggleGroup tgGroup;
-    private ArrayList<Shape> shapeList;
+    private ArrayList<Shape> shapeList;     // canvas's shape collection
     
     private GraphicsContext graphicContext;
 
     private double lastX;
     private double lastY;
     
-    private NextShapeToDraw nextShape;
+    private NextShapeToDraw nextShape;      // "drawing/action mode"
     
-    private Shape selectedShape;
+    private Shape selectedShape;            // current Shape selected
+    
+    
+    // Bind view controls and controller variales using FXML annotation :
     
     @FXML
     private Label labelOption;
@@ -113,6 +117,9 @@ public class GraphicalEditorController implements Initializable {
         initListeners();
     }
 
+    /**
+     * Initialize buttons and label.
+     */
     private void initGUI() {
         this.labelOption.setStyle("-fx-background-color:lightgrey; ");
         
@@ -131,11 +138,15 @@ public class GraphicalEditorController implements Initializable {
         this.btnClone.setDisable(true);
     }
 
+    /**
+     * Initialize application's listeners.
+     */
     private void initListeners() {
         // enable buttons when the corresponding radio button is selected
         this.btnDelete.disableProperty().bind(this.rbSelectMove.selectedProperty().not());
         this.btnClone.disableProperty().bind(this.rbSelectMove.selectedProperty().not());
         
+        // change "mode" when a new radio button is selected
         this.tgGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldToggle, Toggle newToggle) {
                 if (tgGroup.getSelectedToggle() != null) {
@@ -157,37 +168,38 @@ public class GraphicalEditorController implements Initializable {
         
         
         
-
+        // when mouse pressed..
         canvas.setOnMousePressed(e -> {
+            // ..save its position
             lastX = e.getX();
             lastY = e.getY();
             
+            unselectShape();
+            
+            // ..and select a shape (works for the correct "mode")
             if (nextShape == NextShapeToDraw.NONE) {
                 selectedShape = getCanvasShapeAt(lastX, lastY);
                 updateCanvas();
             }
         });
 
+        // when mouse dragged : display the shape to create
         canvas.setOnMouseDragged(e -> {
             updateCanvas();
+            
+            // init drawing properties..
+            double x = e.getX();
+            double y = e.getY();
+                
+            /* TODO : HANDLE left/up sliding !!! */
+            
+            double dx = (x > lastX) ? x - lastX : -(x - lastX);
+            double dy = (y > lastY) ? y - lastY : -(y - lastY);
+            
+            
+//            double dx = x - lastX;
+//            double dy = y - lastY;
 
-            // when a correct shape is selected
-            if (nextShape != NextShapeToDraw.NONE) {
-                // init drawing properties..
-                double x = e.getX();
-                double y = e.getY();
-                
-                
-                /* TODO : HANDLE left sliding !!! */
-                
-                double dx = (x > lastX) ? x - lastX : -(x - lastX);
-                double dy = (y > lastY) ? y - lastY : -(y - lastY);
-                
-                
-//                double dx = x - lastX;
-//                double dy = y - lastY;
-                
-                
 //                if( dx < 0 ) {
 //                    lastX = x;
 //                    dx = -dx;
@@ -197,8 +209,9 @@ public class GraphicalEditorController implements Initializable {
 //                    lastY = y;
 //                    dy = -dy;
 //                }
-                
-                
+
+            // when a correct shape is selected
+            if (nextShape != NextShapeToDraw.NONE) {
                 
                 // ..and draw the selected shape
                 switch (nextShape) {
@@ -226,35 +239,36 @@ public class GraphicalEditorController implements Initializable {
                         return;
                 }
 
-//                lastX = 0;
-//                lastY = 0;
+            } else {
+                if (selectedShape != null) {
+                    moveSelection(dx, dy);
+                }
             }
         });
         
         
+        
+        // when mouse released : save the displayed shape in the controller's collection
         canvas.setOnMouseReleased(e -> {
+            // calculate width/height
+            double x = e.getX();
+            double y = e.getY();
+                
+            /* TODO : HANDLE left/up sliding !!! */
+            
+            double dx = (x > lastX) ? x - lastX : -(x - lastX);
+            double dy = (y > lastY) ? y - lastY : -(y - lastY);
+            
+            
+//            double dx = x - lastX;
+//            double dy = y - lastY;
             
             // when a correct shape is selected
             if (nextShape != NextShapeToDraw.NONE) {
-                // init drawing properties..
-                double x = e.getX();
-                double y = e.getY();
-                
-                
-                /* TODO : HANDLE left sliding !!! */
-                
-                double dx = (x > lastX) ? x - lastX : -(x - lastX);
-                double dy = (y > lastY) ? y - lastY : -(y - lastY);
-                
-                
-//                double dx = x - lastX;
-//                double dy = y - lastY;
-                
-                
                 
                 Shape shapeToDraw = null;
                 
-                // ..and draw the selected shape
+                // ..and save the selected shape
                 switch (nextShape) {
                     case RECTANGLE:
                         shapeToDraw = new Rectangle(lastX, lastY, dx, dy);
@@ -274,6 +288,8 @@ public class GraphicalEditorController implements Initializable {
                         ((Line)shapeToDraw).setFill(null);
                         
                         ((Line)shapeToDraw).setStroke(this.colorPicker.getValue());
+                        
+                        ((Line)shapeToDraw).setStrokeWidth(5);
                         break;
                     default:
                         // should'nt be reached
@@ -293,22 +309,27 @@ public class GraphicalEditorController implements Initializable {
                     lastX = 0;
                     lastY = 0;
                 }
+            } else {
+                if (selectedShape != null) {
+                    moveSelection(dx, dy);
+                }
             }
             
+            // refresh what is displayed
             updateCanvas();
-            
         });
     }
     
+    /**
+     * Redraw the shapes
+     */
     private void updateCanvas() {
-            // Redraw the shapes.  The entire list of shapes
-            // is redrawn whenever the user adds a new shape
-            // or moves an existing shape.
         graphicContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         
         for (Shape shape : shapeList) {
             graphicContext.setFill(shape.getFill());
             graphicContext.setStroke(shape.getStroke());
+            graphicContext.setLineWidth(shape.getStrokeWidth());
             
             if (shape instanceof Rectangle) {
                 graphicContext.fillRect(((Rectangle) shape).getX(), ((Rectangle) shape).getY(),
@@ -323,28 +344,66 @@ public class GraphicalEditorController implements Initializable {
                         ((Ellipse) shape).getRadiusX(), ((Ellipse) shape).getRadiusY());
             }
             else if (shape instanceof Line) {
-                graphicContext.setLineWidth(5);
                 graphicContext.fill();
                 graphicContext.strokeLine(((Line) shape).getStartX(), ((Line) shape).getStartY(),
                         ((Line) shape).getEndX(), ((Line) shape).getEndY());
-                graphicContext.setLineWidth(1);
             }
         }
         
-        
         graphicContext.setFill(this.colorPicker.getValue());
         graphicContext.setStroke(Color.BLACK);
+        graphicContext.setLineWidth(1);
     }
 
+    /**
+     * Return a Shape if there is one Shape that match the given position.
+     * @param x
+     * @param y
+     * @return 
+     */
     private Shape getCanvasShapeAt(double x, double y) {
         for (Shape shape : shapeList) {
             if (shape.contains(new Point2D(x, y))) {
+                // change the selected shape's appearance
                 shape.setStrokeWidth(5);
-                shape.setCursor(Cursor.CROSSHAIR);
+                shape.setStroke(Color.DARKBLUE);
+                shape.setCursor(Cursor.HAND);
                 shape.setEffect(new DropShadow(0.5, 0, 0, Color.ALICEBLUE));
                 return shape;
             }
         }
         return null;
+    }
+    
+    /**
+     * 
+     */
+    private void unselectShape() {
+        if (selectedShape != null) {
+            for (Shape shape : shapeList) {
+                // restore current selected shape's appearance
+                if (shape.equals(selectedShape)) {
+                    shape.setStrokeWidth(1);
+                    shape.setStroke(Color.BLACK);
+                    break;
+                }
+            }
+            selectedShape = null;
+        }
+    }
+
+    private void moveSelection(double dx, double dy) {
+        if (selectedShape != null) {
+            for (Shape shape : shapeList) {
+                // move shape
+                if (shape.equals(selectedShape)) {
+                    Translate translate = new Translate(dx, dy);  
+
+                    //Adding transformation to selectedShape 
+                    shape.getTransforms().addAll(translate); 
+                    break;
+                }
+            }
+        }
     }
 }

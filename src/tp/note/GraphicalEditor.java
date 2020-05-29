@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- *
+ * Launchs application.
  * @author Antonin
  */
 public class GraphicalEditor extends Application {
