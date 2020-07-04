@@ -11,6 +11,8 @@ HMI - Polytech ET3 IT - Noted practical for S6
 
 [Subject link](./IHM_Polytech_Programmation_des_Interfaces_Interactives_Avancees_1.pdf)
 
+![Illustration : application screenshot](./Screenshot-30062020.png)
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development purpose.
@@ -32,3 +34,9 @@ First, clone this repository with the following command :
 `git clone https://github.com/adepreis/tp-note-IHM-AntoninD`
 
 Then create the Java project from `/src` folder using your favorite IDE.
+
+### Run the latest version
+
+Execute the .jar file from the last [release assets](https://github.com/adepreis/tp-note-IHM-AntoninD/releases/tag/0.0.1) with the following command :
+
+`java -jar tp-note-IHM-AntoninD.jar`
